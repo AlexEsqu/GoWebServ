@@ -24,12 +24,9 @@ func main() {
 	serveMux.HandleFunc("GET /admin/metrics", apiCfg.handlerMetrics)
 	serveMux.HandleFunc("POST /admin/reset", apiCfg.handlerReset)
 
-	serveMux.HandleFunc("GET /api/healthz", func(w http.ResponseWriter, req *http.Request) {
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK\n"))
-	})
-	serveMux.HandleFunc("/api/validate_chirp", apiCfg.handlerValidateChirp)
+	serveMux.HandleFunc("POST /api/validate_chirp", handlerValidateChirp)
+	serveMux.HandleFunc("GET /api/healthz", handleHealthz)
+
 
 	server := &http.Server{
 		Addr:		":" + port,

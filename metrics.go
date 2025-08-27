@@ -30,3 +30,9 @@ func (cfg *apiConfig) handlerReset(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusOK)
     fmt.Fprintf(w, "Hits reset to %d", cfg.fileserverHits.Load())
 }
+
+func handleHealthz(w http.ResponseWriter, req *http.Request) {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK\n"))
+	}
