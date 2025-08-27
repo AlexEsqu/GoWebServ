@@ -1,21 +1,38 @@
 package main
 
 import (
-	"log"
-	"net/http"
-	"sync/atomic"
+    "database/sql"
+    "log"
+    "net/http"
+    "os"
+    "sync/atomic"
+
+    "github.com/joho/godotenv"
+    _ "github.com/lib/pq"
+	"/home/mkling/GoWebServ/internal/database"
 )
 
 type apiConfig struct {
-	fileserverHits atomic.Int32
+	fileserverHits	atomic.Int32
+	dbQueries		*database.Queries
 }
 
 func main() {
+
+	godotenv.Load()
 	const filepathRoot = "."
 	const port = "8080"
 
-	apiCfg := &apiConfig{}
+	dbURL := os.Getenv("DB_URL")
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Printf("Failed to open the Database")
+	}
+	dbQueries := database.New(db)
 
+	apiCfg := &apiConfig{}
+	apiCfg.dbQueries = dbQueries
+	
 	serveMux := http.NewServeMux()
 
 	fsHandler := apiCfg.middlewareMetricsInc(http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot))))
@@ -36,7 +53,5 @@ func main() {
 	log.Printf("Serving on port: %s\n", port)
 	log.Fatal(server.ListenAndServe())
 }
-
-// Connect to postgres using: psql "postgres://postgres:postgres@localhost:5432/chirpy"
 
 
