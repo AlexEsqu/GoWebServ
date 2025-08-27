@@ -37,5 +37,6 @@ func main() {
 	log.Fatal(server.ListenAndServe())
 }
 
+// Connect to postgres using: psql "postgres://postgres:postgres@localhost:5432/chirpy"
 
 
