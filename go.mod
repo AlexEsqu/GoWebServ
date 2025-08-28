@@ -1,4 +1,4 @@
-module http.ServeMux
+module github.com/mkling/GoWebServ
 
 go 1.24.4
 

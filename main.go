@@ -6,15 +6,25 @@ import (
     "net/http"
     "os"
     "sync/atomic"
+	"time"
 
     "github.com/joho/godotenv"
     _ "github.com/lib/pq"
-	"/home/mkling/GoWebServ/internal/database"
+	"github.com/mkling/GoWebServ/internal/database"
+	"github.com/google/uuid"
 )
 
 type apiConfig struct {
 	fileserverHits	atomic.Int32
 	dbQueries		*database.Queries
+	platform		string
+}
+
+type User struct {
+	ID        uuid.UUID `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Email     string    `json:"email"`
 }
 
 func main() {
@@ -32,6 +42,7 @@ func main() {
 
 	apiCfg := &apiConfig{}
 	apiCfg.dbQueries = dbQueries
+	apiCfg.platform = os.Getenv("PLATFORM")
 	
 	serveMux := http.NewServeMux()
 
@@ -42,7 +53,9 @@ func main() {
 	serveMux.HandleFunc("POST /admin/reset", apiCfg.handlerReset)
 
 	serveMux.HandleFunc("POST /api/validate_chirp", handlerValidateChirp)
+	serveMux.HandleFunc("POST /api/users", apiCfg.handlerAddUsers)
 	serveMux.HandleFunc("GET /api/healthz", handleHealthz)
+
 
 
 	server := &http.Server{
